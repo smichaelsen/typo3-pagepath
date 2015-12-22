@@ -1,0 +1,7 @@
+{
+	"name": "smichaelsen/typo3-pagepath",
+	"type": "typo3-cms-extension",
+	"autoload": {
+		"classmap": ["Classes/"]
+	}
+}
