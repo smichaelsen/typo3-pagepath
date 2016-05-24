@@ -28,22 +28,22 @@ $EM_CONF[$_EXTKEY] = array (
   'lockType' => '',
   'author_company' => '',
   'version' => '1.0.3',
-  'constraints' => 
+  'constraints' =>
   array (
-    'depends' => 
+    'depends' =>
     array (
-      'typo3' => '4.5.0-6.2.999',
-      'php' => '5.3.2-10.0.0',
+      'typo3' => '7.6.2-7.6.99',
+      'php' => '5.5.0-7.0.99',
     ),
-    'conflicts' => 
+    'conflicts' =>
     array (
     ),
-    'suggests' => 
+    'suggests' =>
     array (
     ),
   ),
   '_md5_values_when_last_written' => 'a:8:{s:9:"ChangeLog";s:4:"e3cc";s:9:"README.md";s:4:"b34a";s:25:"class.tx_pagepath_api.php";s:4:"f6b6";s:30:"class.tx_pagepath_resolver.php";s:4:"2f5d";s:16:"ext_autoload.php";s:4:"e871";s:12:"ext_icon.gif";s:4:"a89b";s:17:"ext_localconf.php";s:4:"81af";s:14:"doc/manual.sxw";s:4:"4942";}',
-  'suggests' => 
+  'suggests' =>
   array (
   ),
   'user' => 'dmitry',
