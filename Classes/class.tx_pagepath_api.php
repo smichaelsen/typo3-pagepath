@@ -34,7 +34,7 @@ class tx_pagepath_api
         }
         $siteUrl = self::getSiteUrl($pageId);
         if ($siteUrl) {
-            $url = $siteUrl . 'index.php?eID=pagepath&data=' . base64_encode(serialize($data));
+            $url = $siteUrl . 'index.php?eID=pagepath&data=' . base64_encode(json_encode($data));
             // Send TYPO3 cookies as this may affect path generation
             $headers = array(
                 'Cookie: fe_typo_user=' . $_COOKIE['fe_typo_user']
