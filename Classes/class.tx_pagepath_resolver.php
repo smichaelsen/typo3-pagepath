@@ -44,7 +44,7 @@ class tx_pagepath_resolver
      */
     public function __construct()
     {
-        $params = unserialize(base64_decode(GeneralUtility::_GP('data')));
+        $params = json_decode(base64_decode(GeneralUtility::_GP('data')), true);
         if (is_array($params)) {
             $this->pageId = $params['id'];
             $this->parameters = $params['parameters'];
