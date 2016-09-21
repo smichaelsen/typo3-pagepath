@@ -25,7 +25,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
-
 /**
  * This class create frontend page address from the page id value and parameters.
  *
@@ -105,7 +104,15 @@ class tx_pagepath_resolver
 
 }
 
-if (GeneralUtility::getIndpEnv('REMOTE_ADDR') != $_SERVER['SERVER_ADDR']) {
+$conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['pagepath']);
+if ($conf === FALSE) {
+    $conf = [
+        'allow_ip' => '127.0.0.1',
+    ];
+}
+if (GeneralUtility::getIndpEnv('REMOTE_ADDR') != $_SERVER['SERVER_ADDR'] &&
+    !GeneralUtility::cmpIP(GeneralUtility::getIndpEnv('REMOTE_ADDR'), $conf['allow_ip'])
+) {
     header('HTTP/1.0 403 Access denied');
     // Empty output!!!
 } else {
