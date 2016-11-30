@@ -1,3 +1,9 @@
+2016-11-30  Sebastian Michaelsen  <sebastian@michaelsen.io>
+
+	* As Dmitry stepped down as maintainer for this extension I decided to continue his work. Thank you, Dmitry!
+	* Security Release, fixes https://typo3.org/teams/security/security-bulletins/typo3-extensions/typo3-ext-sa-2016-020/
+	* Released version 1.0.4
+
 2014-02-14  Dmitry Dulepov  <dmitry.dulepov@gmail.com>
 
 	* Compatibility with TYPO3 6.2
