@@ -11,6 +11,9 @@
     "require": {
         "typo3/cms-core": "^7.6 || ^8.0"
     },
+    "require-dev": {
+        "namelesscoder/typo3-repository-client": "^1.2.0"
+    },
     "replace": {
         "pagepath": "self.version",
         "typo3-ter/pagepath": "self.version"
