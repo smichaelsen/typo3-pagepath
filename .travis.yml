@@ -53,6 +53,7 @@ after_script:
         # Upload
         TAG_MESSAGE=`git tag -n10 -l $TRAVIS_TAG | sed 's/^[0-9.]*[ ]*//g'`
         echo "Uploading release ${TRAVIS_TAG} to TER"
+        mv ../typo3-pagepath ../pagepath
         .Build/bin/upload . "$TYPO3_ORG_USERNAME" "$TYPO3_ORG_PASSWORD" "$TAG_MESSAGE"
       fi;
     fi;
