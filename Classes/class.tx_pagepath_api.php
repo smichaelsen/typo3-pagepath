@@ -19,9 +19,11 @@ class tx_pagepath_api
      *
      * @param int $pageId
      * @param string $parameters
-     * @return    string    Path to page or empty string
+     * @param bool $throwExceptionOnError
+     * @return string Path to page or empty string
+     * @throws \Smichaelsen\Pagepage\PagePathRequestFailedException
      */
-    static public function getPagePath($pageId, $parameters = '')
+    static public function getPagePath($pageId, $parameters = '', $throwExceptionOnError = false)
     {
         if (is_array($parameters)) {
             $parameters = GeneralUtility::implodeArrayForUrl('', $parameters);
@@ -39,7 +41,16 @@ class tx_pagepath_api
             $headers = array(
                 'Cookie: fe_typo_user=' . $_COOKIE['fe_typo_user']
             );
-            $result = GeneralUtility::getURL($url, false, $headers);
+            if ($throwExceptionOnError) {
+                $report = [];
+                $result = GeneralUtility::getURL($url, false, $headers, $report);
+                if ($report['error'] !== 0) {
+                    throw new \Smichaelsen\Pagepage\PagePathRequestFailedException('Request to obtain page path failed: (' . $report['error'] . ') ' . $report['message'], 1486649511);
+                }
+            } else {
+                $result = GeneralUtility::getURL($url, false, $headers);
+            }
+
             $urlParts = parse_url($result);
             if (!is_array($urlParts)) {
                 // filter_var is too strict (for example, underscore characters make it fail). So we use parse_url here for a quick check.
