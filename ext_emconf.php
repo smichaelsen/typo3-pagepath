@@ -11,9 +11,8 @@ $EM_CONF[$_EXTKEY] = array(
     'constraints' => [
         'depends' =>
             [
-                'typo3' => '7.6.2-7.6.99',
+                'typo3' => '7.6.2-8.5.99',
                 'php' => '5.5.0-7.0.99',
             ],
     ],
-    'comment' => 'Compatibility with TYPO3 6.2',
 );
