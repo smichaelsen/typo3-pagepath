@@ -18,8 +18,8 @@ Page id must be integer value. Parameters can be either an array or a string. If
 The following examples are all valid and equavalent:
 
     $parameters = '&tx_ttnews[tt_news]=123';
-    $parameters = array('tx_ttnews[tt_news]' => 123);
-    $parameters = array('tx_ttnews' => array('tt_news' => 123));
+    $parameters = ['tx_ttnews[tt_news]' => 123];
+    $parameters = ['tx_ttnews' => ['tt_news' => 123]];
     
 The result will be either a fully qualified URL to the page or an empty string (meaning “No URL”).
 Important! If there are many web sites in the page tree, the call should be made within the proper web site.
@@ -30,13 +30,13 @@ For example, if there are example1.com and example2.com, and Backend is open at 
 
 ### Version 1.1
 
-Developed for TYPO3 7 and with composer support. So far there is no TER release, but it may follow. Please contact me if you need one.
+Developed for TYPO3 7.
 
 TYPO3 8 was not explicitly tested yet, but *should* work. Please contact me if you need explicit TYPO3 8 support. 
 
 ### Version 1.0
 
-The original code by Dmitry which is compatible with TYPO3 4.5 - 6.2. It is released to the [TER](https://typo3.org/extensions/repository/view/pagepath).
+The original code by Dmitry which is compatible with TYPO3 4.5 - 6.2.
 
 ## Contacts
 
