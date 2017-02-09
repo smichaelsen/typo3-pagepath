@@ -45,7 +45,7 @@ class tx_pagepath_api
                 $report = [];
                 $result = GeneralUtility::getURL($url, false, $headers, $report);
                 if ($report['error'] !== 0) {
-                    throw new \Smichaelsen\Pagepage\PagePathRequestFailedException('Request to obtain page path failed: (' . $report['error'] . ') ' . $report['message'], 1486649511);
+                    throw new \Smichaelsen\Pagepage\PagePathRequestFailedException('Request to obtain page path failed: (' . $report['error'] . ') ' . $report['message']. "\n" . $url, 1486649511);
                 }
             } else {
                 $result = GeneralUtility::getURL($url, false, $headers);
