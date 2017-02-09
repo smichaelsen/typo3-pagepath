@@ -2,6 +2,8 @@
 
 This is an extension for the TYPO3 CMS.
 
+[![Build Status](https://travis-ci.org/smichaelsen/typo3-pagepath.svg?branch=master)](https://travis-ci.org/smichaelsen/typo3-pagepath)
+
 ## What it does
 
 This extension provides API for other extensions to create a path to a TYPO3 page using page id and URL parameters.
