@@ -30,13 +30,15 @@ class Api
         );
 
         // Send TYPO3 cookies as this may affect path generation
-        /*$headers = [
+        $headers = [
             'Cookie: fe_typo_user=' . $_COOKIE['fe_typo_user'],
-        ];*/
+        ];
 
-        $result = file_get_contents($url); // fixme: Using GeneralUtility::getUrl($url, 0, $headers) fails
+        $report = [];
+        $result = GeneralUtility::getUrl($url, 0, $headers, $report);
+
         if ($result === false) {
-            throw new ApiException('Request to resolver ' . $url . ' failed.', 1554880240);
+            throw new ApiException('Request to resolver ' . $url . ' failed. (' . $report['lib'] . ': ' . $report['message'] . ')', 1554880240);
         }
         $urlParts = parse_url($result);
         if (!is_array($urlParts)) {
