@@ -1,7 +1,9 @@
-2019-04-10  Sebastian Michaelsen <sebastian@michaelsen.io>
+Version 2.0
 
 	* Refactor code to use PHP namespaces
-	* Released version 2.0.0
+	* Add support for TCEMAIN.previewDomain
+	* Fix: Do not rely on pages.url_scheme (field does not exist anymore)
+	* Use Exceptions for error handling
 
 2014-02-14  Dmitry Dulepov  <dmitry.dulepov@gmail.com>
 
