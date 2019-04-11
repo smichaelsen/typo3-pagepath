@@ -1,7 +1,10 @@
-2017-02-15  Sebastian Michaelsen <sebastian@michaelsen.io>
+Version 2.0
 
-	* Compatibility with TYPO3 8.6
-	* Released version 1.1.6
+	* Compatible with TYPO3 8.7
+	* Refactor code to use PHP namespaces
+	* Add support for TCEMAIN.previewDomain
+	* Fix: Do not rely on pages.url_scheme (field does not exist anymore)
+	* Use Exceptions for error handling
 
 2014-02-14  Dmitry Dulepov  <dmitry.dulepov@gmail.com>
 
