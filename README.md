@@ -15,7 +15,7 @@ To obtain a path to the page develop should use the following call:
 
 `$pagepath = \Smic\Pagepath\Api::getPagePath($pageId, $parameters);`
 
-Page id must be integer value. Parameters must be an array. The format is the same as for the `\TYPO3\CMS\Core\Utility\GeneralUtility_div::implodeArrayForUrl()` function.
+Page id must be integer value. Parameters must be an array. The format is the same as for the `\TYPO3\CMS\Core\Utility\GeneralUtility::implodeArrayForUrl()` function.
 
 The following examples are valid and equivalent:
 
@@ -31,7 +31,7 @@ For example, if there are example1.com and example2.com, and Backend is open at 
 
 ### Version 2.0
 
-Developed for TYPO# 8.7
+Developed for TYPO3 8.7
 
 ### Version 1.1
 
