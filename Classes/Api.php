@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace Smic\Pagepath;
 
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Api
@@ -52,6 +53,19 @@ class Api
         }
 
         return $result;
+    }
+
+    public static function getPagePathCached(int $pageId, array $parameters = []): string
+    {
+        $cache = GeneralUtility::makeInstance(CacheManager::class)->getCache('pagepath');
+        $entryIdentifier = hash('sha256', serialize([$pageId, $parameters]));
+        if ($cache->has($entryIdentifier)) {
+            return $cache->get($entryIdentifier);
+        }
+
+        $pagepath = self::getPagePath($pageId, $parameters);
+        $cache->set($entryIdentifier, $pagepath, ['pageId_' . $pageId]);
+        return $pagepath;
     }
 
     /**

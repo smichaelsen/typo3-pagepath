@@ -29,9 +29,13 @@ Important! If there are many web sites in the page tree, the call should be made
 
 For example, if there are example1.com and example2.com, and Backend is open at https://example1.com/, resolving will work correctly only for example1.com. To overcome this limitation, make sure you have `config.typolinkEnableLinksAcrossDomains=1` in TypoScript setup for all sites.
 
+## Caching
+
+Calls to `\Smic\Pagepath\Api::getPagePath()` are not cached. For an improved performance you can use `\Smic\Pagepath\Api::getPagePathCached()`, which caches its result internally.
+
 ## Compatibility
 
-### Version 2.0
+### Version 2.x
 
 Developed for TYPO3 8.7
 
