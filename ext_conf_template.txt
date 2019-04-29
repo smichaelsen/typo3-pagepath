@@ -1,0 +1,6 @@
+# cat=pagepath/links/100; type=string; label=Basic Auth Username
+authorization.username =
+# cat=pagepath/links/200; type=string; label=Basic Auth Password
+authorization.password =
+# cat=pagepath/links/300; type=boolean; label=Disable SSL certificate verification
+disableSslVerification =
