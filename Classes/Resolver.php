@@ -68,6 +68,8 @@ class Resolver
         $GLOBALS['TSFE']->getConfigArray();
 
         // Set linkVars, absRefPrefix, etc
-        \TYPO3\CMS\Frontend\Page\PageGenerator::pagegenInit();
+        // deprecated in TYPO3 9.5
+        // \TYPO3\CMS\Frontend\Page\PageGenerator::pagegenInit();
+        $GLOBALS['TSFE']->preparePageContentGeneration();
     }
 }
