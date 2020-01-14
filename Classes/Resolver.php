@@ -41,7 +41,7 @@ class Resolver
         $cObj = GeneralUtility::makeInstance(ContentObjectRenderer::class);
         $typolinkConf = [
             'parameter' => $pageId,
-            'useCacheHash' => !empty($this->parameters),
+            'useCacheHash' => !empty($parameters),
         ];
         if (!empty($parameters)) {
             $typolinkConf['additionalParams'] = $parameters;
