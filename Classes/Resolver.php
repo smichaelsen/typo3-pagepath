@@ -23,7 +23,6 @@ class Resolver
             return $response->withStatus(403);
         }
 
-        \TYPO3\CMS\Frontend\Utility\EidUtility::initTCA();
         $url = $this->resolveUrl((int)$params['id'], (string)$params['parameters']);
 
         $response->getBody()->write($url);
@@ -68,6 +67,6 @@ class Resolver
         $GLOBALS['TSFE']->getConfigArray();
 
         // Set linkVars, absRefPrefix, etc
-        \TYPO3\CMS\Frontend\Page\PageGenerator::pagegenInit();
+        $GLOBALS['TSFE']->preparePageContentGeneration();
     }
 }
