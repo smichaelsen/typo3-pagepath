@@ -35,21 +35,12 @@ Calls to `\Smic\Pagepath\Api::getPagePath()` are not cached. For an improved per
 
 ## Compatibility
 
-### Version 3.x
-
-Developed for TYPO3 9.5
-
-### Version 2.x
-
-Developed for TYPO3 8.7
-
-### Version 1.1
-
-Developed for TYPO3 7.
-
-### Version 1.0
-
-The original code by Dmitry which is compatible with TYPO3 4.5 - 6.2.
+pagepath Version | Compatible with TYPO3 version(s)
+-----------------|---------------------------------
+1.0              | 4.5 - 6.2
+1.1              | 7.x
+2.x              | 8.7
+3.x              | 9.5
 
 ## Contacts
 
