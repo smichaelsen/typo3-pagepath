@@ -5,6 +5,7 @@ namespace Smic\Pagepath;
 use GuzzleHttp\Exception\RequestException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Api
@@ -103,9 +104,6 @@ class Api
 
     protected static function getExtensionConfiguration(): array
     {
-        if (!isset($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['pagepath'])) {
-            return [];
-        }
-        return unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['pagepath']);
+        return GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('pagepath');
     }
 }
