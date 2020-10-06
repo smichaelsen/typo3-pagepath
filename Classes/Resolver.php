@@ -56,7 +56,7 @@ class Resolver
         return $url;
     }
 
-    protected function createTSFE(int $pageId): void
+    protected function createTSFE(int $pageId)
     {
         $GLOBALS['TSFE'] = GeneralUtility::makeInstance(TypoScriptFrontendController::class, $GLOBALS['TYPO3_CONF_VARS'], $pageId, '');
 

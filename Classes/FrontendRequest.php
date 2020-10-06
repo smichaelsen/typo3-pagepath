@@ -13,17 +13,17 @@ class FrontendRequest
 
     protected $url = '';
 
-    public function addHeader(string $key, string $value): void
+    public function addHeader(string $key, string $value)
     {
         $this->headers[$key] = $value;
     }
 
-    public function setVerify(bool $verify): void
+    public function setVerify(bool $verify)
     {
         $this->verify = $verify;
     }
 
-    public function setUrl(string $url): void
+    public function setUrl(string $url)
     {
         $this->url = $url;
     }
