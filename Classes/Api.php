@@ -6,13 +6,15 @@ use GuzzleHttp\Exception\RequestException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\Site\Entity\Site;
+use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Api
 {
-    public static function getPagePath(int $pageId, array $parameters = []): string
+    public static function getPagePath(int $pageId, array $parameters = [], int $languageId = 0): string
     {
-        $url = self::buildFrontendRequestUrl($pageId, $parameters);
+        $url = self::buildFrontendRequestUrl($pageId, $parameters, $languageId);
 
         $frontendRequest = GeneralUtility::makeInstance(FrontendRequest::class);
         $frontendRequest->setUrl($url);
@@ -48,7 +50,7 @@ class Api
         return $result;
     }
 
-    public static function getPagePathCached(int $pageId, array $parameters = []): string
+    public static function getPagePathCached(int $pageId, array $parameters = [], int $languageId = 0): string
     {
         $cache = GeneralUtility::makeInstance(CacheManager::class)->getCache('pagepath');
         $entryIdentifier = hash('sha256', serialize([$pageId, $parameters]));
@@ -56,7 +58,7 @@ class Api
             return $cache->get($entryIdentifier);
         }
 
-        $pagepath = self::getPagePath($pageId, $parameters);
+        $pagepath = self::getPagePath($pageId, $parameters, $languageId);
         $cache->set($entryIdentifier, $pagepath, ['pageId_' . $pageId]);
         return $pagepath;
     }
@@ -70,16 +72,22 @@ class Api
             return $scheme . rtrim($pageTsConfig['TCEMAIN.']['previewDomain'], '/') . '/';
         }
 
-        $domain = BackendUtility::firstDomainRecord(BackendUtility::BEgetRootLine($pageId));
+        $site = GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($pageId);
+        $domain = (string)$site->getBase();
         if ($domain === null) {
             return GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
         }
 
-        return $scheme . $domain . '/';
+        return $domain;
     }
 
-    protected static function buildFrontendRequestUrl(int $pageId, array $parameters): string
+    protected static function buildFrontendRequestUrl(int $pageId, array $parameters, int $languageId): string
     {
+        $language = GeneralUtility::makeInstance(SiteFinder::class)
+            ->getSiteByPageId($pageId)
+            ->getLanguageById($languageId)
+            ->getTwoLetterIsoCode();
+
         $parametersString = GeneralUtility::implodeArrayForUrl('', $parameters);
         $data = [
             'id' => $pageId,
@@ -94,8 +102,9 @@ class Api
         $token = TokenUtility::createToken($data);
 
         $url = sprintf(
-            '%sindex.php?eID=pagepath&data=%s&token=%s',
+            '%s/%s/?pagepath=true&data=%s&token=%s',
             $siteUrl,
+            $language,
             base64_encode(json_encode($data)),
             $token
         );
