@@ -7,7 +7,6 @@
     "typo3/cms-core": "^9.5 || ^10.4"
   },
   "replace": {
-    "pagepath": "self.version",
     "typo3-ter/pagepath": "self.version"
   },
   "extra": {
