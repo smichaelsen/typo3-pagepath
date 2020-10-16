@@ -22,11 +22,11 @@ class Api
         $frontendRequest->addHeader('Cookie', 'fe_typo_user=' . $_COOKIE['fe_typo_user']);
 
         $extensionConfiguration = self::getExtensionConfiguration();
-        if (isset($extensionConfiguration['authorization.']['username'], $extensionConfiguration['authorization.']['password'])) {
+        if (isset($extensionConfiguration['authorization']['username'], $extensionConfiguration['authorization']['password'])) {
             $encodedCredentials = base64_encode(sprintf(
                 '%s:%s',
-                $extensionConfiguration['authorization.']['username'],
-                $extensionConfiguration['authorization.']['password']
+                $extensionConfiguration['authorization']['username'],
+                $extensionConfiguration['authorization']['password']
             ));
             $frontendRequest->addHeader('Authorization', 'Basic ' . $encodedCredentials);
         }
