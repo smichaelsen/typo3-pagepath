@@ -51,7 +51,6 @@ class Resolver implements MiddlewareInterface
 
         $typolinkConf = [
             'parameter' => $pageId,
-            'useCacheHash' => !empty($parameters),
         ];
 
         if (!empty($parameters)) {
