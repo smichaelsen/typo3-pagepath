@@ -22,7 +22,7 @@ class Api
         $frontendRequest->addHeader('Cookie', 'fe_typo_user=' . $_COOKIE['fe_typo_user']);
 
         $extensionConfiguration = self::getExtensionConfiguration();
-        if (isset($extensionConfiguration['authorization']['username'], $extensionConfiguration['authorization']['password'])) {
+        if (!empty($extensionConfiguration['authorization']['username']) && !empty($extensionConfiguration['authorization']['password'])) {
             $encodedCredentials = base64_encode(sprintf(
                 '%s:%s',
                 $extensionConfiguration['authorization']['username'],
@@ -63,17 +63,17 @@ class Api
         return $pagepath;
     }
 
-    protected static function getSiteUrl(int $pageId): string
+    protected static function getSiteUrl(int $pageId, Site $site): string
     {
         $pageTsConfig = BackendUtility::getPagesTSconfig($pageId);
-        $scheme = GeneralUtility::getIndpEnv('TYPO3_SSL') ? 'https://' : 'http://';
 
         if (isset($pageTsConfig['TCEMAIN.']['previewDomain'])) {
+            $scheme = GeneralUtility::getIndpEnv('TYPO3_SSL') ? 'https://' : 'http://';
             return $scheme . rtrim($pageTsConfig['TCEMAIN.']['previewDomain'], '/') . '/';
         }
 
-        $site = GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($pageId);
         $domain = (string)$site->getBase();
+
         if ($domain === null) {
             return GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
         }
@@ -83,10 +83,10 @@ class Api
 
     protected static function buildFrontendRequestUrl(int $pageId, array $parameters, int $languageId): string
     {
-        $language = GeneralUtility::makeInstance(SiteFinder::class)
-            ->getSiteByPageId($pageId)
-            ->getLanguageById($languageId)
-            ->getTwoLetterIsoCode();
+        $site = GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($pageId);
+        $language = $site->getLanguageById($languageId)->getBase()->getPath();
+
+        $language = trim($language, '/');
 
         $parametersString = GeneralUtility::implodeArrayForUrl('', $parameters);
         $data = [
@@ -95,19 +95,20 @@ class Api
         if (!empty($parametersString) && $parametersString[0] === '&') {
             $data['parameters'] = $parametersString;
         }
-        $siteUrl = self::getSiteUrl($pageId);
+        $siteUrl = self::getSiteUrl($pageId, $site);
         if (empty($siteUrl)) {
             throw new ApiException('Domain for page ' . $pageId . ' could not be determined.', 1554880211);
         }
-        $token = TokenUtility::createToken($data);
 
-        $url = sprintf(
-            '%s/%s/?pagepath=true&data=%s&token=%s',
-            $siteUrl,
-            $language,
-            base64_encode(json_encode($data)),
-            $token
-        );
+
+        $urlData = [
+            'pagepath' => true,
+            'data' => base64_encode(json_encode($data)),
+            'token' => TokenUtility::createToken($data),
+        ];
+
+        $url = $siteUrl . $language . '/?' . http_build_query($urlData);
+
         return $url;
     }
 
