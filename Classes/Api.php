@@ -5,13 +5,16 @@ namespace Smic\Pagepath;
 use GuzzleHttp\Exception\RequestException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\Site\Entity\Site;
+use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Api
 {
-    public static function getPagePath(int $pageId, array $parameters = []): string
+    public static function getPagePath(int $pageId, array $parameters = [], int $languageId = 0): string
     {
-        $url = self::buildFrontendRequestUrl($pageId, $parameters);
+        $url = self::buildFrontendRequestUrl($pageId, $parameters, $languageId);
 
         $frontendRequest = GeneralUtility::makeInstance(FrontendRequest::class);
         $frontendRequest->setUrl($url);
@@ -19,11 +22,11 @@ class Api
         $frontendRequest->addHeader('Cookie', 'fe_typo_user=' . $_COOKIE['fe_typo_user']);
 
         $extensionConfiguration = self::getExtensionConfiguration();
-        if (isset($extensionConfiguration['authorization.']['username'], $extensionConfiguration['authorization.']['password'])) {
+        if (!empty($extensionConfiguration['authorization']['username']) && !empty($extensionConfiguration['authorization']['password'])) {
             $encodedCredentials = base64_encode(sprintf(
                 '%s:%s',
-                $extensionConfiguration['authorization.']['username'],
-                $extensionConfiguration['authorization.']['password']
+                $extensionConfiguration['authorization']['username'],
+                $extensionConfiguration['authorization']['password']
             ));
             $frontendRequest->addHeader('Authorization', 'Basic ' . $encodedCredentials);
         }
@@ -47,7 +50,7 @@ class Api
         return $result;
     }
 
-    public static function getPagePathCached(int $pageId, array $parameters = []): string
+    public static function getPagePathCached(int $pageId, array $parameters = [], int $languageId = 0): string
     {
         $cache = GeneralUtility::makeInstance(CacheManager::class)->getCache('pagepath');
         $entryIdentifier = hash('sha256', serialize([$pageId, $parameters]));
@@ -55,30 +58,36 @@ class Api
             return $cache->get($entryIdentifier);
         }
 
-        $pagepath = self::getPagePath($pageId, $parameters);
+        $pagepath = self::getPagePath($pageId, $parameters, $languageId);
         $cache->set($entryIdentifier, $pagepath, ['pageId_' . $pageId]);
         return $pagepath;
     }
 
-    protected static function getSiteUrl(int $pageId): string
+    protected static function getSiteUrl(int $pageId, Site $site): string
     {
         $pageTsConfig = BackendUtility::getPagesTSconfig($pageId);
-        $scheme = GeneralUtility::getIndpEnv('TYPO3_SSL') ? 'https://' : 'http://';
 
         if (isset($pageTsConfig['TCEMAIN.']['previewDomain'])) {
+            $scheme = GeneralUtility::getIndpEnv('TYPO3_SSL') ? 'https://' : 'http://';
             return $scheme . rtrim($pageTsConfig['TCEMAIN.']['previewDomain'], '/') . '/';
         }
 
-        $domain = BackendUtility::firstDomainRecord(BackendUtility::BEgetRootLine($pageId));
+        $domain = (string)$site->getBase();
+
         if ($domain === null) {
             return GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
         }
 
-        return $scheme . $domain . '/';
+        return $domain;
     }
 
-    protected static function buildFrontendRequestUrl(int $pageId, array $parameters): string
+    protected static function buildFrontendRequestUrl(int $pageId, array $parameters, int $languageId): string
     {
+        $site = GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($pageId);
+        $language = $site->getLanguageById($languageId)->getBase()->getPath();
+
+        $language = trim($language, '/');
+
         $parametersString = GeneralUtility::implodeArrayForUrl('', $parameters);
         $data = [
             'id' => $pageId,
@@ -86,26 +95,25 @@ class Api
         if (!empty($parametersString) && $parametersString[0] === '&') {
             $data['parameters'] = $parametersString;
         }
-        $siteUrl = self::getSiteUrl($pageId);
+        $siteUrl = self::getSiteUrl($pageId, $site);
         if (empty($siteUrl)) {
             throw new ApiException('Domain for page ' . $pageId . ' could not be determined.', 1554880211);
         }
-        $token = TokenUtility::createToken($data);
 
-        $url = sprintf(
-            '%sindex.php?eID=pagepath&data=%s&token=%s',
-            $siteUrl,
-            base64_encode(json_encode($data)),
-            $token
-        );
+
+        $urlData = [
+            'pagepath' => true,
+            'data' => base64_encode(json_encode($data)),
+            'token' => TokenUtility::createToken($data),
+        ];
+
+        $url = $siteUrl . $language . '/?' . http_build_query($urlData);
+
         return $url;
     }
 
     protected static function getExtensionConfiguration(): array
     {
-        if (!isset($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['pagepath'])) {
-            return [];
-        }
-        return unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['pagepath']);
+        return GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('pagepath');
     }
 }

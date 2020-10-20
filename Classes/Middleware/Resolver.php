@@ -1,17 +1,28 @@
 <?php
 declare(strict_types=1);
-namespace Smic\Pagepath;
+namespace Smic\Pagepath\Middleware;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Smic\Pagepath\TokenUtility;
+use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
-use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
-class Resolver
+class Resolver implements MiddlewareInterface
 {
-    public function processRequest(ServerRequestInterface $request, ResponseInterface $response)
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        $pagePath = $request->getParsedBody()['pagepath'] ?? $request->getQueryParams()['pagepath'] ?? null;
+
+        if ($pagePath === null) {
+            return $handler->handle($request);
+        }
+
+        /** @var Response $response */
+        $response = GeneralUtility::makeInstance(Response::class);
+
         $getParameters = $request->getQueryParams();
         $params = json_decode(base64_decode($getParameters['data']), true);
         if (!is_array($params)) {
@@ -23,29 +34,31 @@ class Resolver
             return $response->withStatus(403);
         }
 
-        $url = $this->resolveUrl((int)$params['id'], (string)$params['parameters']);
+        $url = $this->resolveUrl((int)$params['id'], (string)$params['parameters'], $request);
 
         $response->getBody()->write($url);
         return $response;
     }
 
-    public function resolveUrl($pageId, string $parameters): string
+    public function resolveUrl($pageId, string $parameters, ServerRequestInterface $request): string
     {
         header('Content-type: text/plain; charset=iso-8859-1');
         if ($pageId === 0) {
             return '';
         }
-        $this->createTSFE($pageId);
 
-        $cObj = GeneralUtility::makeInstance(ContentObjectRenderer::class);
+        $this->prepareTSFE($request);
+
         $typolinkConf = [
             'parameter' => $pageId,
-            'useCacheHash' => !empty($parameters),
         ];
+
         if (!empty($parameters)) {
             $typolinkConf['additionalParams'] = $parameters;
         }
-        $url = $cObj->typoLink_URL($typolinkConf);
+
+        $url = $GLOBALS['TSFE']->cObj->typoLink_URL($typolinkConf);
+
         if (empty($url)) {
             $url = '/';
         }
@@ -56,17 +69,11 @@ class Resolver
         return $url;
     }
 
-    protected function createTSFE(int $pageId): void
+    private function prepareTSFE(ServerRequestInterface $request): void
     {
-        $GLOBALS['TSFE'] = GeneralUtility::makeInstance(TypoScriptFrontendController::class, $GLOBALS['TYPO3_CONF_VARS'], $pageId, '');
-
-        $GLOBALS['TSFE']->connectToDB();
-        $GLOBALS['TSFE']->initFEuser();
-        $GLOBALS['TSFE']->determineId();
-        $GLOBALS['TSFE']->initTemplate();
-        $GLOBALS['TSFE']->getConfigArray();
-
+        $GLOBALS['TSFE']->determineId($request);
+        $GLOBALS['TSFE']->getConfigArray($request);
         // Set linkVars, absRefPrefix, etc
-        $GLOBALS['TSFE']->preparePageContentGeneration();
+        $GLOBALS['TSFE']->preparePageContentGeneration($request);
     }
 }
